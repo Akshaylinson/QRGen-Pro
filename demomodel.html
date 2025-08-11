@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QRGen Pro | Professional QR Code Generator</title>
+    <meta name="description" content="Generate professional QR codes instantly for URLs, text, contact info and more">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+              primary: {
+                50: '#f0f9ff',
+                100: '#e0f2fe',
+                500: '#3b82f6',
+                600: '#2563eb',
+                700: '#1d4ed8',
+              },
+            }
+          }
+        }
+      }
+    </script>
+  </head>
+  <body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 font-sans">
+    <div class="container mx-auto px-4 py-12">
+      <div class="max-w-md mx-auto bg-white rounded-xl shadow-xl overflow-hidden">
+        <div class="p-8">
+          <div class="flex items-center justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+            </svg>
+            <h1 class="text-2xl font-bold text-gray-800 ml-2">QRGen Pro</h1>
+          </div>
+          
+          <p class="text-gray-600 text-sm mb-6 text-center">
+            Generate professional QR codes for URLs, text, contact info and more
+          </p>
+          
+          <div class="mb-6">
+            <div id="qrcode" class="flex justify-center p-4 bg-white rounded-lg border border-gray-200 mb-4"></div>
+            
+            <div class="mb-4 hidden" id="filenameContainer">
+              <label for="qrFilename" class="block text-sm font-medium text-gray-700 mb-2">File name (without extension)</label>
+              <input 
+                type="text" 
+                id="qrFilename" 
+                placeholder="my-qr-code" 
+                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
+                value="qr-code"
+              >
+            </div>
+            
+            <div class="flex space-x-4 mb-4">
+              <button id="downloadBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition duration-200 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Download
+              </button>
+              <button id="shareBtn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 px-4 rounded-lg transition duration-200 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
+                Share
+              </button>
+            </div>
+          </div>
+          
+          <div class="mb-6">
+            <label for="qrInput" class="block text-sm font-medium text-gray-700 mb-2">Enter URL or text</label>
+            <input 
+              type="text" 
+              id="qrInput" 
+              placeholder="https://example.com or any text" 
+              class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
+              autofocus
+            >
+          </div>
+          
+          <div class="mb-6">
+            <label for="qrSize" class="block text-sm font-medium text-gray-700 mb-2">QR Code Size</label>
+            <select id="qrSize" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200">
+              <option value="128">Small (128px)</option>
+              <option value="256" selected>Medium (256px)</option>
+              <option value="512">Large (512px)</option>
+            </select>
+          </div>
+          
+          <div class="mb-6">
+            <label for="qrColor" class="block text-sm font-medium text-gray-700 mb-2">QR Code Color</label>
+            <input type="color" id="qrColor" value="#000000" class="w-full h-12 cursor-pointer">
+          </div>
+          
+          <button id="generateBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200">
+            Generate QR Code
+          </button>
+        </div>
+        
+        <div class="bg-gray-50 px-8 py-4 border-t border-gray-200">
+          <p class="text-xs text-gray-500 text-center">
+            QR codes can be scanned with any smartphone camera or QR code reader app
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <script src="app.js"></script>
+  </body>
+</html>
