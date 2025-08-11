@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QRGen Pro | Enterprise-Grade QR Code Generation</title>
+  <meta name="description" content="Generate, track, and manage professional QR codes at scale with our powerful SaaS platform">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            heading: ['Space Grotesk', 'sans-serif'],
+          },
+          colors: {
+            primary: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+            },
+            dark: {
+              800: '#0f172a',
+              900: '#020617',
+            }
+          },
+          animation: {
+            'gradient-x': 'gradient-x 8s ease infinite',
+            'float': 'float 6s ease-in-out infinite',
+          },
+          keyframes: {
+            'gradient-x': {
+              '0%, 100%': {
+                'background-size': '200% 200%',
+                'background-position': 'left center'
+              },
+              '50%': {
+                'background-size': '200% 200%',
+                'background-position': 'right center'
+              }
+            },
+            'float': {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-20px)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .gradient-text {
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+  </style>
+</head>
+<body class="bg-white dark:bg-dark-900 font-sans antialiased">
+  <!-- Navigation -->
+  <nav class="fixed w-full bg-white/80 dark:bg-dark-800/80 backdrop-blur-md z-50 border-b border-gray-100 dark:border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-20 items-center">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+            </svg>
+            <span class="ml-2 text-xl font-bold text-gray-900 dark:text-white font-heading">QRGen Pro</span>
+          </div>
+          <div class="hidden md:block ml-10">
+            <div class="flex space-x-8">
+              <a href="#features" class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 text-sm font-medium">Features</a>
+              <a href="#pricing" class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 text-sm font-medium">Pricing</a>
+              <a href="#generator" class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 text-sm font-medium">Generator</a>
+              <a href="#faq" class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 text-sm font-medium">FAQ</a>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <button id="theme-toggle" class="p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <svg id="theme-icon" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path id="theme-icon-path" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path>
+            </svg>
+          </button>
+          <a href="#login" class="hidden md:inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Log in</a>
+          <a href="#signup" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 shadow-sm">Get started</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <div class="relative pt-28 pb-20 px-4 sm:px-6 lg:pt-32 lg:pb-28 lg:px-8">
+    <div class="absolute inset-0">
+      <div class="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-white dark:from-dark-900 to-gray-50 dark:to-dark-800"></div>
+    </div>
+    <div class="relative max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div class="lg:pr-12">
+          <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-5xl lg:text-6xl font-heading">
+            <span class="block">Next-Gen QR Code</span>
+            <span class="block gradient-text bg-gradient-to-r from-primary-600 to-indigo-600">Generation Platform</span>
+          </h1>
+          <p class="mt-6 text-xl text-gray-600 dark:text-gray-300">
+            Create, track, and manage dynamic QR codes at scale with our enterprise-grade platform. Perfect for marketers, developers, and businesses of all sizes.
+          </p>
+          <div class="mt-10 flex flex-col sm:flex-row gap-4">
+            <a href="#generator" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 shadow-lg transition-all duration-200 transform hover:-translate-y-1">
+              Generate QR Code
+            </a>
+            <a href="#pricing" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary-700 bg-primary-100 hover:bg-primary-200 dark:text-primary-200 dark:bg-primary-900 dark:hover:bg-primary-800 transition-all duration-200">
+              View Pricing
+            </a>
+          </div>
+          <div class="mt-10 flex items-center space-x-4">
+            <div class="flex -space-x-2">
+              <img class="inline-block h-10 w-10 rounded-full ring-2 ring-white dark:ring-dark-800" src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
+              <img class="inline-block h-10 w-10 rounded-full ring-2 ring-white dark:ring-dark-800" src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
+              <img class="inline-block h-10 w-10 rounded-full ring-2 ring-white dark:ring-dark-800" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80" alt="">
+            </div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">
+              Trusted by <span class="font-semibold">10,000+</span> businesses worldwide
+            </div>
+          </div>
+        </div>
+        <div class="relative">
+          <div class="relative w-full aspect-square bg-gradient-to-br from-primary-500 to-indigo-600 rounded-2xl shadow-2xl overflow-hidden animate-gradient-x">
+            <div class="absolute inset-0 flex items-center justify-center p-8">
+              <div id="hero-qrcode" class="bg-white p-4 rounded-lg shadow-lg"></div>
+            </div>
+            <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
+          </div>
+          <div class="absolute -bottom-6 -left-6 w-32 h-32 bg-indigo-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
+          <div class="absolute -top-6 -right-6 w-32 h-32 bg-primary-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float animation-delay-2000"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logo Cloud -->
+  <div class="bg-gray-50 dark:bg-dark-800 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <p class="text-center text-sm font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wide">
+        Trusted by innovative companies worldwide
+      </p>
+      <div class="mt-6 grid grid-cols-2 gap-8 md:grid-cols-6 lg:grid-cols-5">
+        <div class="col-span-1 flex justify-center">
+          <img class="h-12 opacity-60 hover:opacity-100 transition-opacity" src="https://tailwindui.com/img/logos/tuple-logo-gray-400.svg" alt="Tuple">
+        </div>
+        <div class="col-span-1 flex justify-center">
+          <img class="h-12 opacity-60 hover:opacity-100 transition-opacity" src="https://tailwindui.com/img/logos/mirage-logo-gray-400.svg" alt="Mirage">
+        </div>
+        <div class="col-span-1 flex justify-center">
+          <img class="h-12 opacity-60 hover:opacity-100 transition-opacity" src="https://tailwindui.com/img/logos/statickit-logo-gray-400.svg" alt="StaticKit">
+        </div>
+        <div class="col-span-1 flex justify-center">
+          <img class="h-12 opacity-60 hover:opacity-100 transition-opacity" src="https://tailwindui.com/img/logos/transistor-logo-gray-400.svg" alt="Transistor">
+        </div>
+        <div class="col-span-1 flex justify-center">
+          <img class="h-12 opacity-60 hover:opacity-100 transition-opacity" src="https://tailwindui.com/img/logos/workcation-logo-gray-400.svg" alt="Workcation">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Section -->
+  <div id="features" class="py-20 bg-white dark:bg-dark-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl font-heading">
+          <span class="block">Enterprise QR Code Features</span>
+          <span class="block gradient-text bg-gradient-to-r from-primary-600 to-indigo-600">Built for Scale</span>
+        </h2>
+        <p class="mt-4 max-w-2xl text-xl text-gray-600 dark:text-gray-300 mx-auto">
+          Everything you need to create, manage, and track QR codes across your organization.
+        </p>
+      </div>
+
+      <div class="mt-16">
+        <div class="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3">
+          <!-- Feature 1 -->
+          <div class="pt-6">
+            <div class="flow-root bg-gray-50 dark:bg-dark-800 rounded-lg px-6 pb-8 h-full">
+              <div class="-mt-6">
+                <div>
+                  <span class="inline-flex items-center justify-center p-3 bg-gradient-to-r from-primary-500 to-indigo-600 rounded-md shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                    </svg>
+                  </span>
+                </div>
+                <h3 class="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight font-heading">Dynamic QR Codes</h3>
+                <p class="mt-5 text-base text-gray-600 dark:text-gray-300">
+                  Update destination URLs without changing the QR code. Perfect for marketing campaigns where links might change.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature 2 -->
+          <div class="pt-6">
+            <div class="flow-root bg-gray-50 dark:bg-dark-800 rounded-lg px-6 pb-8 h-full">
+              <div class="-mt-6">
+                <div>
+                  <span class="inline-flex items-center justify-center p-3 bg-gradient-to-r from-primary-500 to-indigo-600 rounded-md shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </span>
+                </div>
+                <h3 class="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight font-heading">Real-time Analytics</h3>
+                <p class="mt-5 text-base text-gray-600 dark:text-gray-300">
+                  Track scans by location, device, and time. Get insights into your QR code performance with beautiful dashboards.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature 3 -->
+          <div class="pt-6">
+            <div class="flow-root bg-gray-50 dark:bg-dark-800 rounded-lg px-6 pb-8 h-full">
+              <div class="-mt-6">
+                <div>
+                  <span class="inline-flex items-center justify-center p-3 bg-gradient-to-r from-primary-500 to-indigo-600 rounded-md shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                  </span>
+                </div>
+                <h3 class="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight font-heading">Enterprise Security</h3>
+                <p class="mt-5 text-base text-gray-600 dark:text-gray-300">
+                  Role-based access control, audit logs, and SOC 2 compliance. Keep your QR codes secure and managed properly.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature 4 -->
+          <div class="pt-6">
+            <div class="flow-root bg-gray-50 dark:bg-dark-800 rounded-lg px-6 pb-8 h-full">
+              <div class="-mt-6">
+                <div>
+                  <span class="inline-flex items-center justify-center p-3 bg-gradient-to-r from-primary-500 to-indigo-600 rounded-md shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                    </svg>
+                  </span>
+                </div>
+                <h3 class="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight font-heading">Bulk Generation</h3>
+                <p class="mt-5 text-base text-gray-600 dark:text-gray-300">
+                  Create thousands of unique QR codes in seconds with our CSV import and API. Perfect for product labeling and event tickets.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature 5 -->
+          <div class="pt-6">
+            <div class="flow-root bg-gray-50 dark:bg-dark-800 rounded-lg px-6 pb-8 h-full">
+              <div class="-mt-6">
+                <div>
+                  <span class="inline-flex items-center justify-center p-3 bg-gradient-to-r from-primary-500 to-indigo-600 rounded-md shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </span>
+                </div>
+                <h3 class="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight font-heading">Custom Branding</h3>
+                <p class="mt-5 text-base text-gray-600 dark:text-gray-300">
+                  Add your logo, change colors, and customize frames. Create QR codes that match your brand identity perfectly.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature 6 -->
+          <div class="pt-6">
+            <div class="flow-root bg-gray-50 dark:bg-dark-800 rounded-lg px-6 pb-8 h-full">
+              <div class="-mt-6">
+                <div>
+                  <span class="inline-flex items-center justify-center p-3 bg-gradient-to-r from-primary-500 to-indigo-600 rounded-md shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </span>
+                </div>
+                <h3 class="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight font-heading">Developer API</h3>
+                <p class="mt-5 text-base text-gray-600 dark:text-gray-300">
+                  Integrate QR generation directly into your apps with our REST API. Webhooks, SDKs, and comprehensive documentation included.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Generator Section -->
+  <div id="generator" class="py-20 bg-gray-50 dark:bg-dark-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl font-heading">
+          <span class="block">QR Code Generator</span>
+          <span class="block gradient-text bg-gradient-to-r from-primary-600 to-indigo-600">Try It Now</span>
+        </h2>
+        <p class="mt-4 max-w-2xl text-xl text-gray-600 dark:text-gray-300 mx-auto">
+          Create your first QR code in seconds. No account required for basic generation.
+        </p>
+      </div>
+
+      <div class="mt-16 bg-white dark:bg-dark-900 rounded-2xl shadow-xl overflow-hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Generator Form -->
+          <div class="p-8 sm:p-10">
+            <div class="mb-8">
+              <label for="qrInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Content to encode</label>
+              <input 
+                type="text" 
+                id="qrInput" 
+                placeholder="https://example.com or any text" 
+                class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition duration-200 bg-white dark:bg-dark-800 text-gray-900 dark:text-white"
+                value="https://qrcodepro.com"
+                autofocus
+              >
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div>
+                <label for="qrSize" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Size</label>
+                <select id="qrSize" class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition duration-200 bg-white dark:bg-dark-800 text-gray-900 dark:text-white">
+                  <option value="128">Small (128px)</option>
+                  <option value="256" selected>Medium (256px)</option>
+                  <option value="512">Large (512px)</option>
+                </select>
+              </div>
+              <div>
+                <label for="qrColor" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Color</label>
+                <div class="flex items-center">
+                  <input type="color" id="qrColor" value="#3b82f6" class="w-12 h-12 cursor-pointer bg-white dark:bg-dark-800 border border-gray-300 dark:border-gray-700 rounded-lg mr-3">
+                  <input type="text" id="qrColorText" value="#3b82f6" class="flex-1 px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition duration-200 bg-white dark:bg-dark-800 text-gray-900 dark:text-white">
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-8">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Options</label>
+              <div class="space-y-3">
+                <div class="flex items-center">
+                  <input id="addLogo" type="checkbox" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-700 rounded">
+                  <label for="addLogo" class="ml-3 block text-sm text-gray-700 dark:text-gray-300">Add logo/image overlay</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="addFrame" type="checkbox" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-700 rounded">
+                  <label for="addFrame" class="ml-3 block text-sm text-gray-700 dark:text-gray-300">Add decorative frame</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="dynamicQr" type="checkbox" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-700 rounded">
+                  <label for="dynamicQr" class="ml-3 block text-sm text-gray-700 dark:text-gray-300">Make dynamic (trackable)</label>
+                </div>
+              </div>
+            </div>
+
+            <button id="generateBtn" class="w-full bg-gradient-to-r from-primary-600 to-indigo-600 hover:from-primary-700 hover:to-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+              Generate QR Code
+            </button>
+          </div>
+
+          <!-- QR Code Preview -->
+          <div class="bg-gray-50 dark:bg-dark-800 p-8 sm:p-10 flex flex-col">
+            <div class="flex-1 flex flex-col items-center justify-center">
+              <div id="qrcode" class="bg-white p-4 rounded-lg shadow-md mb-6"></div>
+              <div id="qrcode-placeholder" class="text-center text-gray-500 dark:text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                </svg>
+                <p>Your QR code will appear here</p>
+              </div>
+            </div>
+
+            <div id="download-section" class="hidden">
+              <div class="mb-4">
+                <label for="qrFilename" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">File name</label>
+                <input 
+                  type="text" 
+                  id="qrFilename" 
+                  placeholder="my-qr-code" 
+                  class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition duration-200 bg-white dark:bg-dark-800 text-gray-900 dark:text-white"
+                  value="qr-code"
+                >
+              </div>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button id="downloadBtn" class="flex items-center justify-center bg-white dark:bg-dark-700 hover:bg-gray-50 dark:hover:bg-dark-600 text-gray-800 dark:text-gray-200 py-2 px-4 rounded-lg border border-gray-300 dark:border-gray-600 transition duration-200 shadow-sm">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Download PNG
+                </button>
+                <button id="downloadSvgBtn" class="flex items-center justify-center bg-white dark:bg-dark-700 hover:bg-gray-50 dark:hover:bg-dark-600 text-gray-800 dark:text-gray-200 py-2 px-4 rounded-lg border border-gray-300 dark:border-gray-600 transition duration-200 shadow-sm">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Download SVG
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pricing Section -->
+  <div id="pricing" class="py-20 bg-white dark:bg-dark-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl font-heading">
+          <span class="block">Simple, Transparent</span>
+          <span class="block gradient-text bg-gradient-to-r from-primary-600 to-indigo-600">Pricing</span>
+        </h2>
+        <p class="mt-4 max-w-2xl text-xl text-gray-600 dark:text-gray-300 mx-auto">
+          Choose the perfect plan for your needs. Scale up or down as your business grows.
+        </p>
+      </div>
+
+      <div class="mt-16 space-y-12 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-x-8">
+        <!-- Free Tier -->
+        <div class="relative p-8 bg-white dark:bg-dark-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm flex flex-col">
+          <div class="flex-1">
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white font-heading">Starter</h3>
+            <p class="mt-4 flex items-baseline text-gray-900 dark:text-white">
+              <span class="text-5xl font-extrabold tracking-tight">$0</span>
+              <span class="ml-1 text-xl font-semibold">/month</span>
+            </p>
+            <p class="mt-6 text-gray-600 dark:text-gray-300">Perfect for individuals and small projects</p>
+            <ul role="list" class="mt-6 space-y-4">
+              <li class="flex">
+                <svg class="flex-shrink-0 h-6 w-6 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="ml-3 text-gray-600 dark:text-gray-300">Basic QR generation</span>
+              </li>
+              <li class="flex">
+                <svg class="flex-shrink-0 h-6 w-6 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="ml-3 text-gray-600 dark:text-gray-300">Up to 50 scans/month</span>
+              </li>
+              <li class="flex">
+                <svg class="flex-shrink-0 h-6 w-6 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="ml-3 text-gray-600 dark:text-gray-300">Basic customization</span>
+              </li>
+              <li class="flex">
+                <svg class="flex-shrink-0 h-6 w-6 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="ml-3 text-gray-600 dark:text-gray-300">Email support</span>
+              </li>
+            </ul>
+          </div>
+          <a href="#signup" class="mt-8 block w-full py-3 px-6 border border-transparent rounded-md text-center font-medium bg-gray-100 dark:bg-dark-700 text-primary-700 dark:text-primary-400 hover:bg-gray-200 dark:hover:bg-dark-600">
+            Get started
+          </a>
+        </div>
+
+        <!-- Pro Tier -->
+        <div class="relative p-8 bg-white dark:bg-dark-800 border-2 border-primary-500 rounded-2xl shadow-xl flex flex-col overflow-hidden">
+          <div class="absolute top-0 right-0 -mr-16 -mt-16 bg-white dark:bg-dark-800 p-2 rounded-full shadow-lg">
+            <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-r from-primary-500 to-indigo-600">
+              <svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+              </svg>
+            </span>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white font-heading">Professional</h3>
+            <p class="mt-4 flex items-baseline text-gray-900 dark:text-white">
+              <span class="text-5xl font-extrabold tracking-tight">$29</span>
+              <span class="ml-1 text-xl font-semibold">/month</span>
+            </p>
+            <p class="mt-6 text-gray-600 dark:text-gray-300">For growing businesses and marketing teams</p>
+            <ul role="list" class="mt-6 space-y-4">
+              <li class="flex">
+                <svg class="flex-shrink-0 h-6 w-6 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="ml-3 text-gray-600 dark:text-gray-300">Everything in Starter</span>
+              </li>
+              <li class="flex">
+                <svg class="flex-shrink-0 h-6 w-6 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="ml-3 text-gray-600 dark:text-gray-300">Up to 10,000 scans/month</span>
+              </li>
+              <li class="flex">
+                <svg class="flex-shrink-0 h-6 w-6 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="ml-3 text-gray-600 dark:text-gray-300">Dynamic QR codes</span>
+              </li>
+              <li class="flex">
+                <svg class="flex-shrink-0 h-6 w-6 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="ml-3 text-gray-600 dark:text-gray-300">Advanced analytics</span>
+              </li>
+              <li class="flex">
+                <svg class="flex-shrink-0 h-6 w-6 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="ml-3 text-gray-600 dark:text-gray-300">Brand customization</span>
+              </li>
+              <li class="flex">
+                <svg class="flex-shrink-0 h-6 w-6 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="ml-3 text-gray-600 dark:text-gray-300">Priority email support</span>
+              </li>
+            </ul>
+          </div>
+          <a href="#signup" class="mt-8 block w-full py-3 px-6 border border-transparent rounded-md text-center font-medium bg-gradient-to-r from-primary-600 to-indigo-600 text-white hover:from-primary-700 hover:to-indigo-700 shadow-lg transform hover:-translate-y-0.5 transition duration-200">
+            Get started
+          </a>
+        </div>
+
+        <!-- Enterprise Tier -->
+        <div class="relative p-8 bg-white dark:bg-dark-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm flex flex-col">
+          <div class="flex-1">
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white font-heading">Enterprise</h3>
+            <p class="mt-4 flex items-baseline text-gray-900 dark:text-white">
+              <span class="text-5xl font-extrabold tracking-tight">$99</span>
+              <span class="ml-1 text-xl font-semibold">/month</span>
+            </p>
+            <p class="mt-6 text-gray-600 dark:text-gray-300">For large organizations with advanced needs</p>
+            <ul role="list" class="mt-6 space-y-4">
+              <li class="flex">
+                <svg class="flex-shrink-0 h-6 w-6 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="ml-3 text-gray-600 dark:text-gray-300">Everything in Professional</span>
+              </li>
+              <li class="flex">
+                <svg class="flex-shrink-0 h-6 w-6 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="ml-3 text-gray-600 dark:text-gray-300">Unlimited scans</span>
+              </li>
+              <li class="flex">
+                <svg class="flex-shrink-0 h-6 w-6 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="ml-3 text-gray-600 dark:text-gray-300">Bulk QR generation</span>
+              </li>
+              <li class="flex">
+                <svg class="flex-shrink-0 h-6 w-6 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="ml-3 text-gray-600 dark:text-gray-300">API access</span>
+              </li>
+              <li class="flex">
+                <svg class="flex-shrink-0 h-6 w-6 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="ml-3 text-gray-600 dark:text-gray-300">White-label options</span>
+              </li>
+              <li class="flex">
+                <svg class="flex-shrink-0 h-6 w-6 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="ml-3 text-gray-600 dark:text-gray-300">Dedicated account manager</span>
+              </li>
+              <li class="flex">
+                <svg class="flex-shrink-0 h-6 w-6 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="ml-3 text-gray-600 dark:text-gray-300">24/7 phone support</span>
+              </li>
+            </ul>
+          </div>
+          <a href="#contact" class="mt-8 block w-full py-3 px-6 border border-transparent rounded-md text-center font-medium bg-gray-100 dark:bg-dark-700 text-primary-700 dark:text-primary-400 hover:bg-gray-200 dark:hover:bg-dark-600">
+            Contact sales
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ Section -->
+  <div id="faq" class="py-20 bg-gray-50 dark:bg-dark-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl font-heading">
+          <span class="block">Frequently Asked</span>
+          <span class="block gradient-text bg-gradient-to-r from-primary-600 to-indigo-600">Questions</span>
+        </h2>
+        <p class="mt-4 max-w-2xl text-xl text-gray-600 dark:text-gray-300 mx-auto">
+          Everything you need to know about QRGen Pro. Can't find an answer? Contact our team.
+        </p>
+      </div>
+
+      <div class="mt-16 max-w-3xl mx-auto">
+        <div class="space-y-8">
+          <!-- FAQ Item 1 -->
+          <div class="bg-white dark:bg-dark-700 shadow-lg rounded-2xl overflow-hidden">
+            <button class="faq-toggle w-full flex items-center justify-between p-6 text-left focus:outline-none">
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">What types of QR codes can I create?</h3>
+              <svg class="h-6 w-6 text-primary-500 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-content px-6 pb-6 hidden">
+              <p class="text-gray-600 dark:text-gray-300">
+                QRGen Pro supports all standard QR code types including URL, text, email, phone, SMS, vCard, WiFi credentials, and more. 
+                Our platform also supports dynamic QR codes that can be edited after creation without changing the QR code image.
+              </p>
+            </div>
+          </div>
+
+          <!-- FAQ Item 2 -->
+          <div class="bg-white dark:bg-dark-700 shadow-lg rounded-2xl overflow-hidden">
+            <button class="faq-toggle w-full flex items-center justify-between p-6 text-left focus:outline-none">
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">How do dynamic QR codes work?</h3>
+              <svg class="h-6 w-6 text-primary-500 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-content px-6 pb-6 hidden">
+              <p class="text-gray-600 dark:text-gray-300">
+                Dynamic QR codes contain a short URL that redirects to your final destination. This allows you to change the destination URL 
+                at any time without needing to reprint or redistribute the QR code. You can also track scans in real-time and gather analytics 
+                about when and where your QR codes are being scanned.
+              </p>
+            </div>
+          </div>
+
+          <!-- FAQ Item 3 -->
+          <div class="bg-white dark:bg-dark-700 shadow-lg rounded-2xl overflow-hidden">
+            <button class="faq-toggle w-full flex items-center justify-between p-6 text-left focus:outline-none">
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">What file formats can I download?</h3>
+              <svg class="h-6 w-6 text-primary-500 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-content px-6 pb-6 hidden">
+              <p class="text-gray-600 dark:text-gray-300">
+                You can download your QR codes in multiple formats including PNG, JPG, SVG, PDF, and EPS. Vector formats (SVG, EPS) are 
+                perfect for printing at any size without quality loss, while raster formats (PNG, JPG) are ideal for digital use.
+              </p>
+            </div>
+          </div>
+
+          <!-- FAQ Item 4 -->
+          <div class="bg-white dark:bg-dark-700 shadow-lg rounded-2xl overflow-hidden">
+            <button class="faq-toggle w-full flex items-center justify-between p-6 text-left focus:outline-none">
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">Is there an API available?</h3>
+              <svg class="h-6 w-6 text-primary-500 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-content px-6 pb-6 hidden">
+              <p class="text-gray-600 dark:text-gray-300">
+                Yes! QRGen Pro offers a comprehensive REST API for Professional and Enterprise plans. Our API allows you to generate QR codes 
+                programmatically, manage your existing QR codes, and retrieve analytics data. API documentation is available to all paid users.
+              </p>
+            </div>
+          </div>
+
+          <!-- FAQ Item 5 -->
+          <div class="bg-white dark:bg-dark-700 shadow-lg rounded-2xl overflow-hidden">
+            <button class="faq-toggle w-full flex items-center justify-between p-6 text-left focus:outline-none">
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">Can I add my logo to QR codes?</h3>
+              <svg class="h-6 w-6 text-primary-500 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-content px-6 pb-6 hidden">
+              <p class="text-gray-600 dark:text-gray-300">
+                Absolutely. Our platform allows you to upload your logo or any image to be placed in the center of your QR code. We automatically 
+                ensure the QR code remains scannable while incorporating your branding. This feature is available on all paid plans.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA Section -->
+  <div class="bg-gradient-to-r from-primary-600 to-indigo-700">
+    <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl font-heading">
+          <span class="block">Ready to transform your business</span>
+          <span class="block">with powerful QR codes?</span>
+        </h2>
+        <p class="mt-6 max-w-2xl text-xl text-primary-100 mx-auto">
+          Join thousands of businesses using QRGen Pro to connect their physical and digital worlds.
+        </p>
+        <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+          <a href="#signup" class="flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary-700 bg-white hover:bg-gray-50 shadow-lg md:py-4 md:text-lg md:px-10 transform hover:-translate-y-0.5 transition duration-200">
+            Get started for free
+          </a>
+          <a href="#demo" class="flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-500 bg-opacity-60 hover:bg-opacity-70 md:py-4 md:text-lg md:px-10 transform hover:-translate-y-0.5 transition duration-200">
+            Request a demo
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900">
+    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
+        <div class="col-span-2">
+          <h3 class="text-xl font-bold text-white font-heading">QRGen Pro</h3>
+          <p class="mt-4 text-gray-400">
+            The most powerful QR code platform for businesses of all sizes. Create, track, and manage QR codes at scale.
+          </p>
+          <div class="mt-6 flex space-x-6">
+            <a href="#" class="text-gray-400 hover:text-white">
+              <span class="sr-only">Facebook</span>
+              <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" />
+              </svg>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white">
+              <span class="sr-only">Twitter</span>
+              <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
+              </svg>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white">
+              <span class="sr-only">GitHub</span>
+              <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+              </svg>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white">
+              <span class="sr-only">LinkedIn</span>
+              <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd" />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase">Product</h3>
+          <ul class="mt-4 space-y-4">
+            <li>
+              <a href="#features" class="text-base text-gray-400 hover:text-white">Features</a>
+            </li>
+            <li>
+              <a href="#pricing" class="text-base text-gray-400 hover:text-white">Pricing</a>
+            </li>
+            <li>
+              <a href="#generator" class="text-base text-gray-400 hover:text-white">Generator</a>
+            </li>
+            <li>
+              <a href="#api" class="text-base text-gray-400 hover:text-white">API</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase">Resources</h3>
+          <ul class="mt-4 space-y-4">
+            <li>
+              <a href="#blog" class="text-base text-gray-400 hover:text-white">Blog</a>
+            </li>
+            <li>
+              <a href="#docs" class="text-base text-gray-400 hover:text-white">Documentation</a>
+            </li>
+            <li>
+              <a href="#guides" class="text-base text-gray-400 hover:text-white">Guides</a>
+            </li>
+            <li>
+              <a href="#support" class="text-base text-gray-400 hover:text-white">Support</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase">Company</h3>
+          <ul class="mt-4 space-y-4">
+            <li>
+              <a href="#about" class="text-base text-gray-400 hover:text-white">About</a>
+            </li>
+            <li>
+              <a href="#careers" class="text-base text-gray-400 hover:text-white">Careers</a>
+            </li>
+            <li>
+              <a href="#privacy" class="text-base text-gray-400 hover:text-white">Privacy</a>
+            </li>
+            <li>
+              <a href="#terms" class="text-base text-gray-400 hover:text-white">Terms</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-12 border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between">
+        <p class="text-base text-gray-400">
+          &copy; 2025 QRGen Pro. All rights reserved.
+        </p>
+        <div class="mt-4 md:mt-0 flex space-x-6">
+          <a href="#privacy" class="text-base text-gray-400 hover:text-white">Privacy Policy</a>
+          <a href="#terms" class="text-base text-gray-400 hover:text-white">Terms of Service</a>
+          <a href="#cookies" class="text-base text-gray-400 hover:text-white">Cookies</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
